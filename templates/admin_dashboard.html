@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard • Lost & Found{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="badges">
+    <span class="badge"><span class="dot"></span> Admin Dashboard</span>
+    <span class="badge">Approve posts • Review claims</span>
+  </div>
+
+  <h1 style="font-size:40px;">Admin Dashboard</h1>
+  <p>Approve new reports, remove posts, and review claims submitted by students.</p>
+
+  <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+    <a class="btn" href="{{ url_for('home') }}">Go to Home</a>
+    <a class="btn btn-primary" href="{{ url_for('admin_logout') }}">Logout</a>
+  </div>
+</section>
+
+<div class="table-wrap" style="margin-top:16px;">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:70px;">ID</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Location</th>
+        <th style="width:140px;">Date Found</th>
+        <th style="width:130px;">Photo</th>
+        <th style="width:120px;">Status</th>
+        <th style="width:240px;">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item['id'] }}</td>
+        <td><strong>{{ item['name'] }}</strong></td>
+        <td>{{ item['description'] }}</td>
+        <td>{{ item['location'] }}</td>
+        <td>{{ item['date_found'] }}</td>
+        <td>
+          {% if item['photo'] %}
+            <img src="{{ url_for('static', filename='uploads/' + item['photo']) }}"
+                 alt="Photo of {{ item['name'] }}"
+                 style="width:100px;height:64px;object-fit:cover;border-radius:14px;border:1px solid rgba(122,77,255,0.18); background:#f2f2ff;">
+          {% else %}
+            <span style="color: rgba(15,16,32,0.55); font-weight:700;">No photo</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if item['approved'] == 1 %}
+            <span style="display:inline-flex; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; border:1px solid rgba(34,197,94,0.25); background: rgba(34,197,94,0.10); color: rgba(13,77,35,0.90);">
+              Approved
+            </span>
+          {% else %}
+            <span style="display:inline-flex; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px; border:1px solid rgba(245,158,11,0.25); background: rgba(245,158,11,0.12); color: rgba(120,67,0,0.92);">
+              Pending
+            </span>
+          {% endif %}
+        </td>
+        <td class="table-actions">
+          {% if item['approved'] == 0 %}
+            <a href="{{ url_for('approve_item', item_id=item['id']) }}">Approve</a>
+            &nbsp;•&nbsp;
+          {% else %}
+            <a href="{{ url_for('disapprove_item', item_id=item['id']) }}">Disapprove</a>
+            &nbsp;•&nbsp;
+          {% endif %}
+
+          <a href="{{ url_for('delete_item', item_id=item['id']) }}"
+             onclick="return confirm('Delete this item?');"
+             style="color:#b42318;">
+             Delete
+          </a>
+        </td>
+      </tr>
+
+      <tr>
+        <td colspan="8" style="background: rgba(122,77,255,0.04);">
+          <div style="padding: 10px 0;">
+            <strong style="color: rgba(15,16,32,0.88);">Claims:</strong>
+
+            {% set item_claims = claims_by_item.get(item['id'], []) %}
+            {% if item_claims %}
+              <ul style="margin:10px 0 0 18px; color: rgba(15,16,32,0.78);">
+                {% for c in item_claims %}
+                  <li style="margin-bottom:10px;">
+                    <strong>{{ c['claimant_name'] }}</strong> — {{ c['email'] }}<br>
+                    <span style="color: rgba(15,16,32,0.62);">{{ c['message'] }}</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <div style="margin-top:8px; color: rgba(15,16,32,0.60);">
+                No claims yet.
+              </div>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

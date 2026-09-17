@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Home • Lost & Found{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="badges">
+    <span class="badge"><span class="dot"></span> Home Page</span>
+    <span class="badge">North Forsyth • Raider Nation</span>
+  </div>
+
+  <h1>Lost &amp; Found</h1>
+  <p>Browse approved items found around campus. If it’s yours, submit a quick claim.</p>
+
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="{{ url_for('report') }}">Report a Found Item</a>
+    <a class="btn" href="{{ url_for('admin_login') }}">Admin Login</a>
+  </div>
+</section>
+
+<div class="section-head">
+  <h2 class="section-title">Recently Found</h2>
+
+  <form class="searchbar" method="GET" action="{{ url_for('home') }}">
+    <input
+      class="search-input"
+      type="search"
+      name="q"
+      value="{{ q }}"
+      placeholder="Search: Hoodie, AirPods, Gym, Hallway…"
+      aria-label="Search items"
+    />
+    {% if q %}
+      <a class="btn btn-small" href="{{ url_for('home') }}">Clear</a>
+    {% endif %}
+    <button class="btn btn-primary btn-small" type="submit">Search</button>
+  </form>
+</div>
+
+{% if q %}
+  <div class="search-meta">
+    Showing results for <span class="search-pill">“{{ q }}”</span>
+  </div>
+{% endif %}
+
+{% if items|length == 0 %}
+  <div class="empty-state">
+    <h3>No items found</h3>
+    <p>Try a different keyword like a color, location, or item type.</p>
+    <a class="btn btn-primary" href="{{ url_for('home') }}">View all items</a>
+  </div>
+{% else %}
+  <div class="grid">
+    {% for item in items %}
+      <div class="card lift">
+        {% if item.photo %}
+          <img class="item-photo" src="{{ url_for('static', filename='uploads/' + item.photo) }}" alt="Item photo">
+        {% endif %}
+
+        <div class="card-pad">
+          <p class="item-title">{{ item.name }}</p>
+
+          <p class="item-meta">
+            {{ item.description }}<br>
+            <strong>Location:</strong> {{ item.location }}<br>
+            <strong>Date:</strong> {{ item.date_found }}
+          </p>
+
+          <a class="btn btn-primary btn-small" href="{{ url_for('claim', item_id=item.id) }}">Claim this</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endblock %}

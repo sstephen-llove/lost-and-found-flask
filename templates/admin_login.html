@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Admin Login • Lost & Found{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="badges">
+    <span class="badge"><span class="dot"></span> Admin Access</span>
+  </div>
+
+  <h1 style="font-size:40px;">Admin Login</h1>
+  <p>Enter the admin password to approve posts and review claims.</p>
+</section>
+
+<div class="form-card" style="max-width:560px; margin-top:16px;">
+  <form method="POST">
+    <label for="password">Password</label>
+    <input id="password" type="password" name="password" placeholder="Enter admin password" required>
+
+    {% if error %}
+      <p style="margin-top:10px; color:#b42318; font-weight:800;">
+        {{ error }}
+      </p>
+    {% endif %}
+
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">Login</button>
+      <a class="btn" href="{{ url_for('home') }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
